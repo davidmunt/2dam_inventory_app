@@ -40,9 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
            BlocConsumer<LoginBloc, LoginState>(
              listener: (context, state) {
                if (state.user != null) {
-                 ScaffoldMessenger.of(context).showSnackBar(
-                   const SnackBar(content: Text('Login Successful')),
-                 );
                  context.go('/home');
                } else if (state.errorMessage.isNotEmpty) {
                  ScaffoldMessenger.of(context).showSnackBar(

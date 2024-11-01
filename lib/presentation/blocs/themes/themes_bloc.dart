@@ -10,7 +10,8 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   void _onThemeChanged(ThemeChanged event, Emitter<ThemeState> emit) {
     emit(state.copyWith(
       colorTheme: event.color,
-      darkMode: event.darkmode
+      darkMode: event.darkmode,
+      fontFamily: event.fontFamily,
     ));
   }
 }

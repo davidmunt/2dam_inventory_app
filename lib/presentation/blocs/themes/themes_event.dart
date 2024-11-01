@@ -5,5 +5,6 @@ abstract class ThemeEvent {
 class ThemeChanged extends ThemeEvent {
   final int color;
   final bool darkmode;
-  const ThemeChanged(this.color, this.darkmode);
+  final String fontFamily;
+  const ThemeChanged(this.color, this.darkmode, this.fontFamily);
 }

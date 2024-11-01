@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
+// import 'package:proyecto_integrador/presentation/blocs/login/login_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/themes/themes_bloc.dart';
-import 'package:proyecto_integrador/presentation/blocs/themes/themes_state.dart';
 import 'package:proyecto_integrador/config/theme/app_theme.dart';
 import 'package:proyecto_integrador/config/router/routes.dart';
+import 'package:proyecto_integrador/presentation/blocs/themes/themes_state.dart';
 import 'injection_container.dart' as injection_container;
 
 void main() async {
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
           create: (context) => injection_container.sl<LoginBloc>(),
         ),
         BlocProvider(
-          create: (context) => ThemeBloc(),
+          create: (context) => injection_container.sl<ThemeBloc>(),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
@@ -36,8 +37,9 @@ class MyApp extends StatelessWidget {
             routerConfig: router,
             debugShowCheckedModeBanner: false,
             theme: AppTheme(
-              isDarkmode: state.darkMode,
-              selectedColor: state.colorTheme,
+              isDarkmode: context.read<ThemeBloc>().state.darkMode,
+              selectedColor: context.read<ThemeBloc>().state.colorTheme,
+              fontFamily: context.read<ThemeBloc>().state.fontFamily,
             ).getTheme(),
           );
         },

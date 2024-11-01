@@ -14,43 +14,27 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: '/login',
-      builder: (context, state) => BlocProvider(
-        create: (context) => di.sl<LoginBloc>(),
-        child: const LoginScreen(),
-      ),
+      builder: (BuildContext context, GoRouterState state) {
+        return const LoginScreen();
+      },
     ),
     GoRoute(
       path: '/admin',
-      builder: (context, state) => MultiBlocProvider(
-        providers: [
-          BlocProvider<LoginBloc>(
-            create: (BuildContext context) => di.sl<LoginBloc>(),
-          ),
-        ],
-        child: const AdminScreen(),
-      ),
+      builder: (BuildContext context, GoRouterState state) {
+        return const AdminScreen();
+      },
     ),
     GoRoute(
       path: '/technic',
-      builder: (context, state) => MultiBlocProvider(
-        providers: [
-          BlocProvider<LoginBloc>(
-            create: (BuildContext context) => di.sl<LoginBloc>(),
-          ),
-        ],
-        child: const TechnicScreen(),
-      ),
+      builder: (BuildContext context, GoRouterState state) {
+        return const TechnicScreen();
+      },
     ),
     GoRoute(
       path: '/user',
-      builder: (context, state) => MultiBlocProvider(
-        providers: [
-          BlocProvider<LoginBloc>(
-            create: (BuildContext context) => di.sl<LoginBloc>(),
-          ),
-        ],
-        child: const UserScreen(),
-      ),
+      builder: (BuildContext context, GoRouterState state) {
+        return const UserScreen();
+      },
     ),
   ],
   redirect: (context, state) async {

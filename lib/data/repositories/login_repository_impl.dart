@@ -16,11 +16,12 @@ class LoginRepositoryImpl implements LoginRepository {
    // Simulación de autenticación
    try {
      UserModel usuario = await loginFakeDatasource.getValidUser(email, password);
-     final user = User(email: usuario.email, token: 'random_token', name: usuario.name, type: usuario.type,);
+     final user = User(email: usuario.email, token: 'random_token', name: usuario.name, type: usuario.type, id: usuario.id,);
      await sharedPreferences.setString('token', user.token);
      await sharedPreferences.setString('email', user.email);
      await sharedPreferences.setString('name', user.name);
      await sharedPreferences.setInt('type', user.type);
+     await sharedPreferences.setInt('id', user.id);
      return Right(user);
    } catch (e) {
      return Left(Exception('Credenciales incorrectas'));
@@ -43,5 +44,6 @@ class LoginRepositoryImpl implements LoginRepository {
    await sharedPreferences.remove('email');
    await sharedPreferences.remove('name');
    await sharedPreferences.remove('type');
+   await sharedPreferences.remove('id');
  }
 }

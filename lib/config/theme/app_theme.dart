@@ -16,11 +16,13 @@ class AppTheme {
   final bool useMaterial3;
   int selectedColor;
   final bool isDarkmode;
+  final String fontFamily;
 
   AppTheme({
     this.useMaterial3 = true,
     this.selectedColor = 0,
     this.isDarkmode = false,
+    this.fontFamily = "Roboto",
   });
 
   ThemeData getTheme() => ThemeData(
@@ -30,11 +32,11 @@ class AppTheme {
         appBarTheme: AppBarTheme(
           color: colorList[selectedColor],
           iconTheme: const IconThemeData(color: Colors.white),
-          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20)
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontFamily: fontFamily),
         ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(fontSize: 45, color: Colors.black),
-          bodyLarge: TextStyle(fontSize: 18, color: Colors.black87),
+        textTheme: TextTheme(
+          displayLarge: TextStyle(fontSize: 45, color: Colors.black, fontFamily: fontFamily),
+          bodyLarge: TextStyle(fontSize: 18, color: Colors.black87, fontFamily: fontFamily),
         ),
       );
 }
