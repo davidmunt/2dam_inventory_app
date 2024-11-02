@@ -101,33 +101,48 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                     color: Color.fromARGB(255, 71, 71, 71),
                     thickness: 1,
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: BlocBuilder<InventoryBloc, InventoryState>(builder: (context, state) {
-                      if (state.isLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state.inventories.isEmpty) {
-                        return const Center(child: Text('No hay inventarios disponibles'));
-                      } else {
-                        return ListView.builder(
-                          itemCount: state.inventories.length,
-                          itemBuilder: (context, index) {
-                            final inventory = state.inventories[index];
-                            return Dismissible(
-                              key: Key(inventory.idInventory.toString()),
-                              onDismissed: (direction) {
-                                // de momento no hace nada
-                              },
-                              background: Container(color: Colors.red),
-                              child: ListTile(
-                                title: Text('Marca: ${inventory.brand} - Modelo: ${inventory.model}'),
-                                subtitle: Text('Estado: ${inventory.status} - Aula: ${inventory.idClassroom} - ${inventory.idInventory}'),
-                              ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: BlocBuilder<InventoryBloc, InventoryState>(
+                        builder: (context, state) {
+                          if (state.isLoading) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (state.inventories.isEmpty) {
+                            return const Center(child: Text('No hay inventarios disponibles'));
+                          } else {
+                            return Column(
+                              children: List.generate(state.inventories.length, (index) {
+                                final inventory = state.inventories[index];
+                                return Dismissible(
+                                  key: Key(inventory.idInventory.toString()),
+                                  onDismissed: (direction) {
+                                    // de momento no hace nada
+                                  },
+                                  background: Container(color: Colors.red),
+                                  child: Row(
+                                    children: [
+                                      //lo de la franja de color
+                                      Container(
+                                        width: 3.0,
+                                        color: Colors.blue,
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text('Modelo: ${inventory.model} - Marca: ${inventory.brand}'),
+                                          subtitle: Text(
+                                            'Num_Serie: ${inventory.numSerie} - Aula: ${inventory.idClassroom} \n - ${inventory.gvaDescriptionCodArticulo}',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
                             );
-                          },
-                        );
-                      }
-                    }),
+                          }
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
