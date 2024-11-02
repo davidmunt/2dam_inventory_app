@@ -29,7 +29,6 @@ class TechnicScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // Llama a la función que muestra el diálogo de cierre de sesión
               showLogoutDialog(context);
             },
             child: CircleAvatar(

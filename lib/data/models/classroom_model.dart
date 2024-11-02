@@ -10,7 +10,7 @@ class ClassroomModel {
   factory ClassroomModel.fromJson(Map<String, dynamic> json) {
     return ClassroomModel(
       idClassroom: json['id_classroom'],
-      description: (json['description'].isNotEmpty) ? json['description'] : 'Empty',
+      description: json['description'] ?? 'Empty',
     );
   }
 

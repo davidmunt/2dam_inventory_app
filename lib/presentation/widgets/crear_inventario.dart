@@ -1,4 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
+import 'package:proyecto_integrador/data/datasources/classroom_remote_datasource.dart';
+import 'package:proyecto_integrador/data/models/classroom_model.dart';
+import 'package:http/http.dart' as http;
+import 'package:proyecto_integrador/data/datasources/inventory_type_remote_datasource.dart';
+import 'package:proyecto_integrador/data/models/inventory_type_model.dart';
 
 class CrearInventario extends StatefulWidget {
   const CrearInventario({super.key});
@@ -11,13 +16,36 @@ class _CrearInventarioState extends State<CrearInventario> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _numSerieController = TextEditingController();
   final TextEditingController _marcaController = TextEditingController();
-  final List<int> aulas = List<int>.generate(12, (index) => index + 1);
-  final List<String> tipos = ['Ordenador', 'Portatil', 'Pantalla', 'Proyector'];
-  final List<String> estados = ['Correcto', 'Usando', 'Por usar'];
-
+  List<ClassroomModel> aulas = []; 
+  List<InventoryTypeModel> tipos2 = []; 
   int? aulaSeleccionada;
-  String? tipoSeleccionado;
+  int? tipoSeleccionado; 
   String? estadoSeleccionado;
+  
+  final List<String> estados = ['Correcto', 'Usando', 'Disponible', 'Reparacion'];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClassrooms(); 
+    _fetchInventoryTypes(); 
+  }
+
+  Future<void> _fetchClassrooms() async {
+    final dataSource = ClassroomRemoteDataSourceImpl(http.Client());
+    final classrooms = await dataSource.getAllClassrooms();
+    setState(() {
+      aulas = classrooms; 
+    });
+  }
+
+  Future<void> _fetchInventoryTypes() async {
+    final dataSource2 = InventoryTypeRemoteDataSourceImpl(http.Client());
+    final inventoryTypes = await dataSource2.getAllInventoriesType();
+    setState(() {
+      tipos2 = inventoryTypes; 
+    });
+  }
 
   @override
   void dispose() {
@@ -60,10 +88,10 @@ class _CrearInventarioState extends State<CrearInventario> {
               const SizedBox(height: 10),
               DropdownButtonFormField<int>(
                 decoration: const InputDecoration(labelText: 'Aula'),
-                items: aulas.map((int aula) {
+                items: aulas.map((ClassroomModel aula) {
                   return DropdownMenuItem<int>(
-                    value: aula,
-                    child: Text('Aula $aula'),
+                    value: aula.idClassroom,
+                    child: Text('${aula.idClassroom}'),
                   );
                 }).toList(),
                 onChanged: (value) => setState(() {
@@ -72,12 +100,12 @@ class _CrearInventarioState extends State<CrearInventario> {
                 validator: (value) => value == null ? 'Selecciona un aula' : null,
               ),
               const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<int>(
                 decoration: const InputDecoration(labelText: 'Tipo'),
-                items: tipos.map((String tipo) {
-                  return DropdownMenuItem<String>(
-                    value: tipo,
-                    child: Text(tipo),
+                items: tipos2.map((InventoryTypeModel tipo) {
+                  return DropdownMenuItem<int>(
+                    value: tipo.idType,
+                    child: Text(tipo.description),
                   );
                 }).toList(),
                 onChanged: (value) => setState(() {
@@ -95,7 +123,7 @@ class _CrearInventarioState extends State<CrearInventario> {
                   );
                 }).toList(),
                 onChanged: (value) => setState(() {
-                  estadoSeleccionado = value;
+                  estadoSeleccionado = value; 
                 }),
                 validator: (value) => value == null ? 'Selecciona un estado' : null,
               ),
@@ -105,7 +133,7 @@ class _CrearInventarioState extends State<CrearInventario> {
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context, null);
+                      Navigator.pop(context, null); 
                     },
                     child: const Text('Cancelar'),
                   ),
@@ -116,13 +144,9 @@ class _CrearInventarioState extends State<CrearInventario> {
                           'numSerie': _numSerieController.text,
                           'marca': _marcaController.text,
                           'aula': aulaSeleccionada,
-                          'tipo': tipoSeleccionado,
+                          'tipo': tipoSeleccionado, 
                           'estado': estadoSeleccionado,
                         });
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Completa todos los campos')),
-                        );
                       }
                     },
                     child: const Text('Crear'),

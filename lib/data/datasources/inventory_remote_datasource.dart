@@ -14,7 +14,7 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
  @override
  Future<List<InventoryModel>> getAllInventories() async {
    final response = await client
-       .get(Uri.parse('http://localhost:8080/inventari'));
+       .get(Uri.parse('https://dummyjson.com/c/4503-8dec-4f96-8c19'));
 
    if (response.statusCode == 200) {
      final List<dynamic> inventoriesJson = json.decode(response.body);

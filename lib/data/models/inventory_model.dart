@@ -22,19 +22,19 @@ class InventoryModel {
   });
 
   factory InventoryModel.fromJson(Map<String, dynamic> json) {
-    //revisando la api me he dado cuenta que al hacer un push o pull de los campos id_type, id_classroom, no se añaden, por eso les he puesto un valor default
-    return InventoryModel(
-      idInventory: json['id_inventory'],
-      numSerie: json['num_serie'] ?? 'Empty',
-      idType: (json['id_type'].isNotEmpty) ? json['id_type'] : 1,
-      brand: json['brand'],
-      model: json['model'] ?? 'Empty',
-      gvaCodArticle: json['GVA_cod_article'],
-      gvaDescriptionCodArticulo: json['GVA_description_cod_articulo'],
-      status: json['status'],
-      idClassroom: (json['id_classroom'].isNotEmpty) ? json['id_classroom'] : 1,
-    );
-  }
+  return InventoryModel(
+    idInventory: json['id_inventory'],
+    numSerie: json['num_serie'] ?? 'Empty',
+    idType: json['id_type'] ?? 1,
+    brand: json['brand'],
+    model: json['model'] ?? 'Empty',
+    gvaCodArticle: json['GVA_cod_article'],
+    gvaDescriptionCodArticulo: json['GVA_description_cod_articulo'],
+    status: json['status'],
+    idClassroom: json['id_classroom'] ?? 1,
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     return {

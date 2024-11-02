@@ -22,7 +22,7 @@ class IssueRemoteDataSourceImpl implements IssueRemoteDataSource {
          .map((json) => IssueModel.fromJson(json))
          .toList();
    } else {
-     throw Exception('Error al cargar personajes');
+     throw Exception('Error al cargar los problemas');
    }
  }
 }

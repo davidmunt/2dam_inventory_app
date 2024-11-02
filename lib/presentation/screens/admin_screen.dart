@@ -1,5 +1,8 @@
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
+import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
 import 'package:proyecto_integrador/presentation/widgets/crear_inventario.dart';
@@ -8,23 +11,21 @@ class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _AdminScreenState createState() => _AdminScreenState();
+  AdminScreenState createState() => AdminScreenState();
 }
 
-class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
+class AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    // Inicializa el TabController con el número de tabs y el TickerProvider
     _tabController = TabController(length: 2, vsync: this);
+    context.read<InventoryBloc>().add(LoadInventoriesEvent(''));
   }
 
   @override
   void dispose() {
-    // Asegúrate de limpiar el TabController al eliminar el widget
     _tabController.dispose();
     super.dispose();
   }
@@ -47,9 +48,9 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
               style: TextStyle(fontSize: 12),
             ),
             Divider(
-                    color: Color.fromARGB(255, 71, 71, 71),
-                    thickness: 1,
-                  ),
+              color: Color.fromARGB(255, 71, 71, 71),
+              thickness: 1,
+            ),
           ],
         ),
         centerTitle: true,
@@ -83,30 +84,54 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
         ],
       ),
       body: TabBarView(
-        controller: _tabController, // Asigna el TabController aquí también
-        children: const [
-          // Primer tab
+        controller: _tabController,
+        children: [
           Padding(
-            padding: EdgeInsets.only(top: 16.0),
+            padding: const EdgeInsets.only(top: 16.0),
             child: Align(
               alignment: Alignment.topCenter,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     "Apartat de Inventario",
                     textAlign: TextAlign.center,
                   ),
-                  Divider(
+                  const Divider(
                     color: Color.fromARGB(255, 71, 71, 71),
                     thickness: 1,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: BlocBuilder<InventoryBloc, InventoryState>(builder: (context, state) {
+                      if (state.isLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return ListView.builder(
+                          itemCount: state.inventories.length,
+                          itemBuilder: (context, index) {
+                            final inventory = state.inventories[index];
+                            return Dismissible(
+                              key: Key(inventory.idInventory.toString()),
+                              onDismissed: (direction) {
+                                // de momento no hace nada
+                              },
+                              background: Container(color: Colors.red),
+                              child: ListTile(
+                                title: Text('Marca: ${inventory.brand} - Modelo: ${inventory.model}'),
+                                subtitle: Text('Estado: ${inventory.status} - Aula: ${inventory.idClassroom} - ${inventory.idInventory}'),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }),
                   ),
                 ],
               ),
             ),
           ),
-          // Segundo tab
-          Padding(
+          const Padding(
             padding: EdgeInsets.only(top: 16.0),
             child: Align(
               alignment: Alignment.topCenter,
@@ -129,23 +154,18 @@ class _AdminScreenState extends State<AdminScreen> with SingleTickerProviderStat
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Llamar a CrearInventario como un diálogo y recibir el resultado
-          final result = await showDialog<Map<String, dynamic>?>(
-            context: context,
-            builder: (BuildContext context) {
-              return const AlertDialog(
-                title: Text('Crear inventario'),
-                content: CrearInventario(),
-              );
-            },
-          );
+          final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
+            return const AlertDialog(
+              title: Text('Crear inventario'),
+              content: CrearInventario(),
+            );
+          });
           if (result != null) {
             showDialog<void>(
-              // ignore: use_build_context_synchronously
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('Información de Inventario'),
+                  title: const Text('Informacion del inventario nuevo'),
                   content: Text(
                     'Número de serie: ${result['numSerie']}\n'
                     'Marca: ${result['marca']}\n'
