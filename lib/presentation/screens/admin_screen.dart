@@ -106,6 +106,8 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                     child: BlocBuilder<InventoryBloc, InventoryState>(builder: (context, state) {
                       if (state.isLoading) {
                         return const Center(child: CircularProgressIndicator());
+                      } else if (state.inventories.isEmpty) {
+                        return const Center(child: Text('No hay inventarios disponibles'));
                       } else {
                         return ListView.builder(
                           itemCount: state.inventories.length,
