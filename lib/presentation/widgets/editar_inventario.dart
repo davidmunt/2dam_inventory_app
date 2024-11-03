@@ -5,47 +5,58 @@ import 'package:http/http.dart' as http;
 import 'package:proyecto_integrador/data/datasources/inventory_type_remote_datasource.dart';
 import 'package:proyecto_integrador/data/models/inventory_type_model.dart';
 
-class CrearInventario extends StatefulWidget {
-  const CrearInventario({super.key});
+class EditarInventario extends StatefulWidget {
+  final String numSerie;
+  final String marca;
+  final String modelo;
+  final int idClassroom;
+  final int idType;
+  final String estado;
+  final int idInventory;
+
+  const EditarInventario({
+    super.key,
+    required this.numSerie,
+    required this.marca,
+    required this.modelo,
+    required this.idClassroom,
+    required this.idType,
+    required this.estado,
+    required this.idInventory,
+  });
 
   @override
-  State<CrearInventario> createState() => _CrearInventarioState();
+  State<EditarInventario> createState() => _EditarInventarioState();
 }
 
-class _CrearInventarioState extends State<CrearInventario> {
+class _EditarInventarioState extends State<EditarInventario> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _numSerieController = TextEditingController();
-  final TextEditingController _marcaController = TextEditingController();
-  final TextEditingController _modeloController = TextEditingController();
-  List<ClassroomModel> aulas = []; 
-  List<InventoryTypeModel> tipos2 = []; 
-  int? aulaSeleccionada;
-  int? tipoSeleccionado; 
-  String? estadoSeleccionado;
   
+  late TextEditingController _numSerieController;
+  late TextEditingController _marcaController;
+  late TextEditingController _modeloController;
+  
+  List<ClassroomModel> aulas = [];
+  List<InventoryTypeModel> tipos2 = [];
+  int? aulaSeleccionada;
+  int? tipoSeleccionado;
+  String? estadoSeleccionado;
+  int? idInventory;
+
   final List<String> estados = ['Correcto', 'Usando', 'Disponible', 'Reparacion'];
 
   @override
   void initState() {
     super.initState();
-    _fetchClassrooms(); 
-    _fetchInventoryTypes(); 
-  }
+    _numSerieController = TextEditingController(text: widget.numSerie);
+    _marcaController = TextEditingController(text: widget.marca);
+    _modeloController = TextEditingController(text: widget.modelo);
+    aulaSeleccionada = widget.idClassroom;
+    tipoSeleccionado = widget.idType;
+    estadoSeleccionado = widget.estado;
 
-  Future<void> _fetchClassrooms() async {
-    final dataSource = ClassroomRemoteDataSourceImpl(http.Client());
-    final classrooms = await dataSource.getAllClassrooms();
-    setState(() {
-      aulas = classrooms; 
-    });
-  }
-
-  Future<void> _fetchInventoryTypes() async {
-    final dataSource2 = InventoryTypeRemoteDataSourceImpl(http.Client());
-    final inventoryTypes = await dataSource2.getAllInventoriesType();
-    setState(() {
-      tipos2 = inventoryTypes; 
-    });
+    _fetchClassrooms();
+    _fetchInventoryTypes();
   }
 
   @override
@@ -54,6 +65,22 @@ class _CrearInventarioState extends State<CrearInventario> {
     _marcaController.dispose();
     _modeloController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchClassrooms() async {
+    final dataSource = ClassroomRemoteDataSourceImpl(http.Client());
+    final classrooms = await dataSource.getAllClassrooms();
+    setState(() {
+      aulas = classrooms;
+    });
+  }
+
+  Future<void> _fetchInventoryTypes() async {
+    final dataSource2 = InventoryTypeRemoteDataSourceImpl(http.Client());
+    final inventoryTypes = await dataSource2.getAllInventoriesType();
+    setState(() {
+      tipos2 = inventoryTypes;
+    });
   }
 
   @override
@@ -66,6 +93,7 @@ class _CrearInventarioState extends State<CrearInventario> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              // Campo para número de serie
               TextFormField(
                 controller: _numSerieController,
                 decoration: const InputDecoration(labelText: 'Número de Serie'),
@@ -77,6 +105,8 @@ class _CrearInventarioState extends State<CrearInventario> {
                 },
               ),
               const SizedBox(height: 10),
+
+              // Campo para marca
               TextFormField(
                 controller: _marcaController,
                 decoration: const InputDecoration(labelText: 'Marca'),
@@ -88,6 +118,8 @@ class _CrearInventarioState extends State<CrearInventario> {
                 },
               ),
               const SizedBox(height: 10),
+
+              // Campo para modelo
               TextFormField(
                 controller: _modeloController,
                 decoration: const InputDecoration(labelText: 'Modelo'),
@@ -99,7 +131,10 @@ class _CrearInventarioState extends State<CrearInventario> {
                 },
               ),
               const SizedBox(height: 10),
+
+              // Dropdown para aula
               DropdownButtonFormField<int>(
+                value: aulaSeleccionada,
                 decoration: const InputDecoration(labelText: 'Aula'),
                 items: aulas.map((ClassroomModel aula) {
                   return DropdownMenuItem<int>(
@@ -113,7 +148,10 @@ class _CrearInventarioState extends State<CrearInventario> {
                 validator: (value) => value == null ? 'Selecciona un aula' : null,
               ),
               const SizedBox(height: 10),
+
+              // Dropdown para tipo
               DropdownButtonFormField<int>(
+                value: tipoSeleccionado,
                 decoration: const InputDecoration(labelText: 'Tipo'),
                 items: tipos2.map((InventoryTypeModel tipo) {
                   return DropdownMenuItem<int>(
@@ -127,7 +165,10 @@ class _CrearInventarioState extends State<CrearInventario> {
                 validator: (value) => value == null ? 'Selecciona un tipo' : null,
               ),
               const SizedBox(height: 10),
+
+              // Dropdown para estado
               DropdownButtonFormField<String>(
+                value: estadoSeleccionado,
                 decoration: const InputDecoration(labelText: 'Estado'),
                 items: estados.map((String estado) {
                   return DropdownMenuItem<String>(
@@ -136,17 +177,19 @@ class _CrearInventarioState extends State<CrearInventario> {
                   );
                 }).toList(),
                 onChanged: (value) => setState(() {
-                  estadoSeleccionado = value; 
+                  estadoSeleccionado = value;
                 }),
                 validator: (value) => value == null ? 'Selecciona un estado' : null,
               ),
               const SizedBox(height: 10),
+
+              // Botones de cancelar y guardar
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context, null); 
+                      Navigator.pop(context, null);
                     },
                     child: const Text('Cancelar'),
                   ),
@@ -160,10 +203,11 @@ class _CrearInventarioState extends State<CrearInventario> {
                           'aula': aulaSeleccionada,
                           'tipo': tipoSeleccionado, 
                           'estado': estadoSeleccionado,
+                          'idInventory': idInventory,
                         });
                       }
                     },
-                    child: const Text('Crear'),
+                    child: const Text('Guardar'),
                   ),
                 ],
               ),

@@ -4,6 +4,7 @@ import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
+import 'package:proyecto_integrador/presentation/widgets/editar_inventario.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
 import 'package:proyecto_integrador/presentation/widgets/crear_inventario.dart';
 
@@ -121,11 +122,12 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                   background: Container(color: Colors.red),
                                   child: Row(
                                     children: [
-                                      //lo de la franja de color
+                                      // Franja de color a la izquierda
                                       Container(
                                         width: 3.0,
                                         color: Colors.blue,
                                       ),
+                                      // Contenedor de ListTile
                                       Expanded(
                                         child: ListTile(
                                           title: Text('Modelo: ${inventory.model} - Marca: ${inventory.brand}'),
@@ -133,6 +135,56 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                             'Num_Serie: ${inventory.numSerie} - Aula: ${inventory.idClassroom} \n - ${inventory.gvaDescriptionCodArticulo}',
                                           ),
                                         ),
+                                      ),
+                                      const Spacer(),
+                                      const Text("Funciona"),
+                                      const Spacer(),
+                                      //apartado editar
+                                      IconButton(
+                                        icon: const Icon(Icons.chevron_right),
+                                        onPressed: () async {
+                                        final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Editar inventario'),
+                                            content: EditarInventario(
+                                              numSerie: inventory.numSerie,
+                                              marca: inventory.brand,
+                                              modelo: inventory.model,
+                                              idClassroom: inventory.idClassroom,
+                                              idType: inventory.idType,
+                                              estado: inventory.status,
+                                              idInventory: inventory.idInventory,
+                                            ),
+                                          );
+                                        });
+                                        if (result != null) {
+                                          showDialog<void>(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text('Informacion de la edicion del inventario'),
+                                                content: Text(
+                                                  'id del inventario: ${result['idInventory']}\n'
+                                                  'Número de serie: ${result['numSerie']}\n'
+                                                  'Marca: ${result['marca']}\n'
+                                                  'Modelo: ${result['modelo']}\n'
+                                                  'Aula: ${result['aula']}\n'
+                                                  'Tipo: ${result['tipo']}\n'
+                                                  'Estado: ${result['estado']}',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: const Text('Aceptar'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        }
+                                      },
                                       ),
                                     ],
                                   ),
@@ -186,6 +238,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                   content: Text(
                     'Número de serie: ${result['numSerie']}\n'
                     'Marca: ${result['marca']}\n'
+                    'Modelo: ${result['modelo']}\n'
                     'Aula: ${result['aula']}\n'
                     'Tipo: ${result['tipo']}\n'
                     'Estado: ${result['estado']}',
