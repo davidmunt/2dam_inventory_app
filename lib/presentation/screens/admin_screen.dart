@@ -215,6 +215,8 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                                   'Modelo: ${result['modelo']}\n'
                                                   'Aula: ${result['aula']}\n'
                                                   'Tipo: ${result['tipo']}\n'
+                                                  'gvaCodArticle: ${result['gvaCodArticle']}\n'
+                                                  'gvaDescriptionCodArticulo: ${result['gvaDescriptionCodArticulo']}\n'
                                                   'Estado: ${result['estado']}\n',
                                                 ),
                                                 actions: [
