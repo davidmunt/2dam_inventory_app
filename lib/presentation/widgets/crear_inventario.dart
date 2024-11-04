@@ -118,12 +118,11 @@ class _CrearInventarioState extends State<CrearInventario> {
               TextFormField(
                 controller: _gvaCodArticleController,
                 decoration: const InputDecoration(labelText: 'Cod Articulo'),
-                keyboardType: TextInputType.number, // Solo permite teclado numérico
+                keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'El Cod Articulo es obligatorio';
                   }
-                  // Validación para asegurar que el valor es numérico
                   if (int.tryParse(value) == null) {
                     return 'El Cod Articulo debe ser un número';
                   }

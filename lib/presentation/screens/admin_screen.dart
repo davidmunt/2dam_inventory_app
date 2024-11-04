@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_integrador/domain/entities/inventory.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
@@ -214,7 +215,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                                   'Modelo: ${result['modelo']}\n'
                                                   'Aula: ${result['aula']}\n'
                                                   'Tipo: ${result['tipo']}\n'
-                                                  'Estado: ${result['estado']}',
+                                                  'Estado: ${result['estado']}\n',
                                                 ),
                                                 actions: [
                                                   TextButton(
@@ -227,6 +228,18 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                               );
                                             },
                                           );
+                                          final updatedInventory = Inventory(
+                                            idInventory: result['idInventory'],
+                                            numSerie: result['numSerie'],
+                                            brand: result['marca'],
+                                            model: result['modelo'],
+                                            idClassroom: result['aula'],
+                                            idType: result['tipo'],
+                                            status: result['estado'],
+                                            gvaCodArticle: result['gvaCodArticle'],
+                                            gvaDescriptionCodArticulo: result['gvaDescriptionCodArticulo'],
+                                          );
+                                          context.read<InventoryBloc>().add(UpdateInventoryEvent(updatedInventory));
                                         }
                                       },
                                       ),
@@ -267,14 +280,12 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Mostrar el diálogo de creación del inventario
           final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
             return const AlertDialog(
               title: Text('Crear inventario'),
               content: CrearInventario(),
             );
           });
-
           if (result != null) {
             context.read<InventoryBloc>().add(
               CreateInventoryEvent(
@@ -289,7 +300,6 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                 gvaDescriptionCodArticulo: result['gvaDescriptionCodArticulo'],
               ),
             );
-            // Confirmación de creación
             showDialog<void>(
               context: context,
               builder: (BuildContext context) {
