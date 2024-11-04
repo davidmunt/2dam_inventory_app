@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
+import 'package:proyecto_integrador/presentation/blocs/issue/issue_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/issue/issue_event.dart';
+import 'package:proyecto_integrador/presentation/blocs/issue/issue_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/widgets/editar_inventario.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
@@ -22,7 +25,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    context.read<InventoryBloc>().add(LoadInventoriesEvent(''));
+    context.read<InventoryBloc>().add(const LoadInventoriesEvent(''));
   }
 
   @override
@@ -36,6 +39,15 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
     final loginState = context.read<LoginBloc>().state;
     final nombreUser = loginState.user?.name;
     final iniciales = nombreUser?.substring(0, 2).toUpperCase();
+    final List<Color> colores = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.yellow,
+    Colors.orange,
+    Colors.purple,
+    Colors.cyan,
+  ];
 
     return Scaffold(
       appBar: AppBar(
@@ -114,32 +126,62 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                             return Column(
                               children: List.generate(state.inventories.length, (index) {
                                 final inventory = state.inventories[index];
+                                String idInventario = inventory.idInventory.toString();
+                                context.read<IssueBloc>().add(LoadIssuesEvent(filter: idInventario));
+                                int colorInventario = inventory.idInventory - 1;
                                 return Dismissible(
                                   key: Key(inventory.idInventory.toString()),
                                   onDismissed: (direction) {
-                                    // de momento no hace nada
+                                    context.read<InventoryBloc>().add(DeleteInventoryEvent(inventory.idInventory));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Inventario eliminado'),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
                                   },
                                   background: Container(color: Colors.red),
                                   child: Row(
                                     children: [
-                                      // Franja de color a la izquierda
                                       Container(
-                                        width: 3.0,
-                                        color: Colors.blue,
+                                        width: 4.0,
+                                        height: 90.0,
+                                        color: colores[colorInventario],
+                                        child: const Text(" "),
                                       ),
-                                      // Contenedor de ListTile
                                       Expanded(
                                         child: ListTile(
-                                          title: Text('Modelo: ${inventory.model} - Marca: ${inventory.brand}'),
+                                          title: Text('Modelo: ${inventory.model} ( ${inventory.brand} )'),
                                           subtitle: Text(
-                                            'Num_Serie: ${inventory.numSerie} - Aula: ${inventory.idClassroom} \n - ${inventory.gvaDescriptionCodArticulo}',
+                                            'Num_Serie: ${inventory.numSerie} \nAula: ${inventory.idClassroom} \n${inventory.gvaDescriptionCodArticulo}',
                                           ),
                                         ),
                                       ),
                                       const Spacer(),
-                                      const Text("Funciona"),
+                                      BlocBuilder<IssueBloc, IssueState>(
+                                        builder: (context, issueState) {
+                                          if (issueState.issues.isNotEmpty && issueState.issues.any((issue) => issue.idInventory == inventory.idInventory)) {
+                                            return Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.red[100],
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(color: Colors.red, width: 1),
+                                              ),
+                                              child: const Text(
+                                                'Incidencia',
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            return const SizedBox.shrink(); 
+                                          }
+                                        },
+                                      ),
                                       const Spacer(),
-                                      //apartado editar
                                       IconButton(
                                         icon: const Icon(Icons.chevron_right),
                                         onPressed: () async {
@@ -154,6 +196,8 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                               idType: inventory.idType,
                                               estado: inventory.status,
                                               idInventory: inventory.idInventory,
+                                              gvaCodArticle: inventory.gvaCodArticle,
+                                              gvaDescriptionCodArticulo: inventory.gvaDescriptionCodArticulo,
                                             ),
                                           );
                                         });
@@ -223,18 +267,34 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // Mostrar el diálogo de creación del inventario
           final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
             return const AlertDialog(
               title: Text('Crear inventario'),
               content: CrearInventario(),
             );
           });
+
           if (result != null) {
+            context.read<InventoryBloc>().add(
+              CreateInventoryEvent(
+                idInventory: result['numSerie'],
+                numSerie: result['numSerie'],
+                marca: result['marca'],
+                modelo: result['modelo'],
+                aula: result['aula'],
+                tipo: result['tipo'],
+                estado: result['estado'],
+                gvaCodArticle: result['gvaCodArticle'],
+                gvaDescriptionCodArticulo: result['gvaDescriptionCodArticulo'],
+              ),
+            );
+            // Confirmación de creación
             showDialog<void>(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('Informacion del inventario nuevo'),
+                  title: const Text('Información del inventario nuevo'),
                   content: Text(
                     'Número de serie: ${result['numSerie']}\n'
                     'Marca: ${result['marca']}\n'

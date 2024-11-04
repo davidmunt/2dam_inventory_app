@@ -13,7 +13,6 @@ class LoginRepositoryImpl implements LoginRepository {
 
  @override
  Future<Either<Exception, User>> login(String email, String password) async {
-   // Simulación de autenticación
    try {
      UserModel usuario = await loginFakeDatasource.getValidUser(email, password);
      final user = User(email: usuario.email, token: 'random_token', name: usuario.name, type: usuario.type, id: usuario.id,);

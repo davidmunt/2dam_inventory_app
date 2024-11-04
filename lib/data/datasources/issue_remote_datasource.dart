@@ -14,7 +14,7 @@ class IssueRemoteDataSourceImpl implements IssueRemoteDataSource {
  @override
  Future<List<IssueModel>> getAllIssues() async {
    final response = await client
-       .get(Uri.parse('http://localhost:8080/issues'));
+       .get(Uri.parse('https://dummyjson.com/c/f872-604d-4a22-8891'));
 
    if (response.statusCode == 200) {
      final List<dynamic> issuesJson = json.decode(response.body);

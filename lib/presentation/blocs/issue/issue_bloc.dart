@@ -9,11 +9,13 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
   IssueBloc(this.getAllIssues) : super(IssueState.initial()) {
     on<LoadIssuesEvent>(_onLoadIssues);
   }
+
   Future<void> _onLoadIssues(
     LoadIssuesEvent event,
     Emitter<IssueState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, filter: event.filter));
+
     final result = await getAllIssues();
     result.fold(
       (error) => emit(
@@ -21,7 +23,7 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       (issues) {
         final filterAsInt = int.tryParse(event.filter);
         final filteredIssues = issues.where((issue) {
-          return filterAsInt != null && issue.idIssue == filterAsInt;
+          return filterAsInt == null || issue.idInventory == filterAsInt;
         }).toList();
         emit(state.copyWith(isLoading: false, issues: filteredIssues));
       },

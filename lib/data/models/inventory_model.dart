@@ -25,13 +25,13 @@ class InventoryModel {
   return InventoryModel(
     idInventory: json['id_inventory'],
     numSerie: json['num_serie'] ?? 'Empty',
-    idType: json['id_type'] ?? 1,
+    idType: 1,
     brand: json['brand'],
     model: json['model'] ?? 'Empty',
     gvaCodArticle: json['GVA_cod_article'],
     gvaDescriptionCodArticulo: json['GVA_description_cod_articulo'],
     status: json['status'],
-    idClassroom: json['id_classroom'] ?? 1,
+    idClassroom: 1,
   );
 }
 

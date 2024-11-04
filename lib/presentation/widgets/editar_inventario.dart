@@ -13,6 +13,8 @@ class EditarInventario extends StatefulWidget {
   final int idType;
   final String estado;
   final int idInventory;
+  final int gvaCodArticle;
+  final String gvaDescriptionCodArticulo;
 
   const EditarInventario({
     super.key,
@@ -23,6 +25,8 @@ class EditarInventario extends StatefulWidget {
     required this.idType,
     required this.estado,
     required this.idInventory,
+    required this.gvaCodArticle,
+    required this.gvaDescriptionCodArticulo,
   });
 
   @override
@@ -35,6 +39,8 @@ class _EditarInventarioState extends State<EditarInventario> {
   late TextEditingController _numSerieController;
   late TextEditingController _marcaController;
   late TextEditingController _modeloController;
+  late TextEditingController _gvaCodArticleController;
+  late TextEditingController _gvaDescriptionCodArticuloController;
   
   List<ClassroomModel> aulas = [];
   List<InventoryTypeModel> tipos2 = [];
@@ -45,25 +51,28 @@ class _EditarInventarioState extends State<EditarInventario> {
 
   final List<String> estados = ['Correcto', 'Usando', 'Disponible', 'Reparacion'];
 
-  @override
-  void initState() {
-    super.initState();
-    _numSerieController = TextEditingController(text: widget.numSerie);
-    _marcaController = TextEditingController(text: widget.marca);
-    _modeloController = TextEditingController(text: widget.modelo);
-    aulaSeleccionada = widget.idClassroom;
-    tipoSeleccionado = widget.idType;
-    estadoSeleccionado = widget.estado;
-
-    _fetchClassrooms();
-    _fetchInventoryTypes();
-  }
+@override
+void initState() {
+  super.initState();
+  _numSerieController = TextEditingController(text: widget.numSerie);
+  _marcaController = TextEditingController(text: widget.marca);
+  _modeloController = TextEditingController(text: widget.modelo);
+  _gvaCodArticleController = TextEditingController(text: widget.gvaCodArticle.toString());
+  _gvaDescriptionCodArticuloController = TextEditingController(text: widget.gvaDescriptionCodArticulo);
+  aulaSeleccionada = widget.idClassroom;
+  tipoSeleccionado = widget.idType;
+  estadoSeleccionado = widget.estado;
+  _fetchClassrooms();
+  _fetchInventoryTypes();
+}
 
   @override
   void dispose() {
     _numSerieController.dispose();
     _marcaController.dispose();
     _modeloController.dispose();
+    _gvaCodArticleController.dispose();
+    _gvaDescriptionCodArticuloController.dispose();
     super.dispose();
   }
 
@@ -93,7 +102,6 @@ class _EditarInventarioState extends State<EditarInventario> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              // Campo para número de serie
               TextFormField(
                 controller: _numSerieController,
                 decoration: const InputDecoration(labelText: 'Número de Serie'),
@@ -105,8 +113,6 @@ class _EditarInventarioState extends State<EditarInventario> {
                 },
               ),
               const SizedBox(height: 10),
-
-              // Campo para marca
               TextFormField(
                 controller: _marcaController,
                 decoration: const InputDecoration(labelText: 'Marca'),
@@ -118,8 +124,6 @@ class _EditarInventarioState extends State<EditarInventario> {
                 },
               ),
               const SizedBox(height: 10),
-
-              // Campo para modelo
               TextFormField(
                 controller: _modeloController,
                 decoration: const InputDecoration(labelText: 'Modelo'),
@@ -131,8 +135,29 @@ class _EditarInventarioState extends State<EditarInventario> {
                 },
               ),
               const SizedBox(height: 10),
-
-              // Dropdown para aula
+              TextFormField(
+                controller: _gvaCodArticleController,
+                decoration: const InputDecoration(labelText: 'Cod Articulo'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'El Cod Articulo es obligatorio';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _gvaDescriptionCodArticuloController,
+                decoration: const InputDecoration(labelText: 'Descripcion Cod Articulo gva'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'La Descripcion es obligatoria';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
               DropdownButtonFormField<int>(
                 value: aulaSeleccionada,
                 decoration: const InputDecoration(labelText: 'Aula'),
@@ -147,9 +172,6 @@ class _EditarInventarioState extends State<EditarInventario> {
                 }),
                 validator: (value) => value == null ? 'Selecciona un aula' : null,
               ),
-              const SizedBox(height: 10),
-
-              // Dropdown para tipo
               DropdownButtonFormField<int>(
                 value: tipoSeleccionado,
                 decoration: const InputDecoration(labelText: 'Tipo'),
@@ -165,8 +187,6 @@ class _EditarInventarioState extends State<EditarInventario> {
                 validator: (value) => value == null ? 'Selecciona un tipo' : null,
               ),
               const SizedBox(height: 10),
-
-              // Dropdown para estado
               DropdownButtonFormField<String>(
                 value: estadoSeleccionado,
                 decoration: const InputDecoration(labelText: 'Estado'),
@@ -182,8 +202,6 @@ class _EditarInventarioState extends State<EditarInventario> {
                 validator: (value) => value == null ? 'Selecciona un estado' : null,
               ),
               const SizedBox(height: 10),
-
-              // Botones de cancelar y guardar
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -196,6 +214,38 @@ class _EditarInventarioState extends State<EditarInventario> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        if (!aulas.any((aula) => aula.idClassroom == aulaSeleccionada)) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Error'),
+                              content: const Text('El aula seleccionada no es válida.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return; 
+                        }
+                        if (!tipos2.any((tipo) => tipo.idType == tipoSeleccionado)) {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Error'),
+                              content: const Text('El tipo seleccionado no es válido.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                          return; 
+                        }
                         Navigator.pop(context, {
                           'numSerie': _numSerieController.text,
                           'marca': _marcaController.text,
@@ -203,7 +253,9 @@ class _EditarInventarioState extends State<EditarInventario> {
                           'aula': aulaSeleccionada,
                           'tipo': tipoSeleccionado, 
                           'estado': estadoSeleccionado,
-                          'idInventory': idInventory,
+                          'gvaCodArticle': int.tryParse(_gvaCodArticleController.text),
+                          'gvaDescriptionCodArticulo': _gvaDescriptionCodArticuloController.text,
+                          'idInventory': widget.idInventory, 
                         });
                       }
                     },

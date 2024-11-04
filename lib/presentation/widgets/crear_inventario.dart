@@ -17,6 +17,8 @@ class _CrearInventarioState extends State<CrearInventario> {
   final TextEditingController _numSerieController = TextEditingController();
   final TextEditingController _marcaController = TextEditingController();
   final TextEditingController _modeloController = TextEditingController();
+  final TextEditingController _gvaCodArticleController = TextEditingController();
+  final TextEditingController _gvaDescriptionCodArticuloController = TextEditingController();
   List<ClassroomModel> aulas = []; 
   List<InventoryTypeModel> tipos2 = []; 
   int? aulaSeleccionada;
@@ -53,6 +55,8 @@ class _CrearInventarioState extends State<CrearInventario> {
     _numSerieController.dispose();
     _marcaController.dispose();
     _modeloController.dispose();
+    _gvaCodArticleController.dispose();
+    _gvaDescriptionCodArticuloController.dispose();
     super.dispose();
   }
 
@@ -98,6 +102,35 @@ class _CrearInventarioState extends State<CrearInventario> {
                   return null;
                 },
               ),
+              //
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _gvaDescriptionCodArticuloController,
+                decoration: const InputDecoration(labelText: 'Descripcion Cod Articulo gva'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'La Descripcion es obligatoria';
+                  }
+                  return null;
+                },
+              ),
+              //
+              TextFormField(
+                controller: _gvaCodArticleController,
+                decoration: const InputDecoration(labelText: 'Cod Articulo'),
+                keyboardType: TextInputType.number, // Solo permite teclado numérico
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'El Cod Articulo es obligatorio';
+                  }
+                  // Validación para asegurar que el valor es numérico
+                  if (int.tryParse(value) == null) {
+                    return 'El Cod Articulo debe ser un número';
+                  }
+                  return null;
+                },
+              ),
+              //
               const SizedBox(height: 10),
               DropdownButtonFormField<int>(
                 decoration: const InputDecoration(labelText: 'Aula'),
@@ -150,21 +183,23 @@ class _CrearInventarioState extends State<CrearInventario> {
                     },
                     child: const Text('Cancelar'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.pop(context, {
-                          'numSerie': _numSerieController.text,
-                          'marca': _marcaController.text,
-                          'modelo': _modeloController.text,
-                          'aula': aulaSeleccionada,
-                          'tipo': tipoSeleccionado, 
-                          'estado': estadoSeleccionado,
-                        });
-                      }
-                    },
-                    child: const Text('Crear'),
-                  ),
+                  ElevatedButton( 
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      Navigator.pop(context, {
+                        'numSerie': _numSerieController.text,
+                        'marca': _marcaController.text,
+                        'modelo': _modeloController.text,
+                        'aula': aulaSeleccionada,
+                        'tipo': tipoSeleccionado, 
+                        'estado': estadoSeleccionado,
+                        'gvaCodArticle': int.parse(_gvaCodArticleController.text),
+                        'gvaDescriptionCodArticulo': _gvaDescriptionCodArticuloController.text,
+                      });
+                    }
+                  },
+                  child: const Text('Crear'),
+                ),
                 ],
               ),
             ],
