@@ -49,7 +49,7 @@ class _EditarInventarioState extends State<EditarInventario> {
   String? estadoSeleccionado;
   int? idInventory;
 
-  final List<String> estados = ['Correcto', 'Usando', 'Disponible', 'Reparacion'];
+  final List<String> estados = ['correcto', 'usando', 'disponible', 'reparacion'];
 
 @override
 void initState() {
@@ -186,6 +186,7 @@ void initState() {
                 }),
                 validator: (value) => value == null ? 'Selecciona un tipo' : null,
               ),
+              //estado
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: estadoSeleccionado,
@@ -201,6 +202,7 @@ void initState() {
                 }),
                 validator: (value) => value == null ? 'Selecciona un estado' : null,
               ),
+              //estado
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+// ignore: unused_import
 import 'package:proyecto_integrador/domain/repositories/login_repository.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/screens/login_screen.dart';
 import 'package:proyecto_integrador/presentation/screens/admin_screen.dart';
 import 'package:proyecto_integrador/presentation/screens/technic_screen.dart';
 import 'package:proyecto_integrador/presentation/screens/user_screen.dart';
+// ignore: unused_import
 import 'package:proyecto_integrador/injection_container.dart' as di;
 
 final GoRouter router = GoRouter(
@@ -38,27 +40,20 @@ final GoRouter router = GoRouter(
     ),
   ],
   redirect: (context, state) async {
-    final isLoggedIn = await di.sl<LoginRepository>().isLoggedIn();
-    return isLoggedIn.fold((_) => '/login', (loggedIn) {
-        if (!loggedIn && !state.matchedLocation.contains("/login")) {
-          return "/login";
-        } else {
-          final loginState = context.read<LoginBloc>().state;
-          if (loginState.user != null) {
-            switch (loginState.user!.type) {
-              case 1:
-                return '/admin';
-              case 2:
-                return '/technic';
-              case 3:
-                return '/user';
-              default:
-                return '/login';
-            }
-          }
-          return '/login';
-        }
-      },
-    );
-  },
+  final loginBloc = context.read<LoginBloc>().state;
+  if (loginBloc.user == null && !state.matchedLocation.contains("/login")) {
+    return "/login";
+  } else if (loginBloc.user != null) {
+    switch (loginBloc.user!.type) {
+      case 1:
+        return '/admin';
+      case 2:
+        return '/technic';
+      case 3:
+        return '/user';
+    }
+  }
+  return null;
+},
+
 );

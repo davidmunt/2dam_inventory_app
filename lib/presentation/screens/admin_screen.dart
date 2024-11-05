@@ -6,6 +6,7 @@ import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/issue/issue_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/issue/issue_event.dart';
+// ignore: unused_import
 import 'package:proyecto_integrador/presentation/blocs/issue/issue_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/widgets/editar_inventario.dart';
@@ -129,7 +130,6 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                 final inventory = state.inventories[index];
                                 String idInventario = inventory.idInventory.toString();
                                 context.read<IssueBloc>().add(LoadIssuesEvent(filter: idInventario));
-                                int colorInventario = inventory.idInventory - 1;
                                 return Dismissible(
                                   key: Key(inventory.idInventory.toString()),
                                   onDismissed: (direction) {
@@ -147,7 +147,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                       Container(
                                         width: 4.0,
                                         height: 90.0,
-                                        color: colores[colorInventario],
+                                        color: colores[inventory.idInventory],
                                         child: const Text(" "),
                                       ),
                                       Expanded(
@@ -159,29 +159,22 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                         ),
                                       ),
                                       const Spacer(),
-                                      BlocBuilder<IssueBloc, IssueState>(
-                                        builder: (context, issueState) {
-                                          if (issueState.issues.isNotEmpty && issueState.issues.any((issue) => issue.idInventory == inventory.idInventory)) {
-                                            return Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.red[100],
-                                                borderRadius: BorderRadius.circular(8),
-                                                border: Border.all(color: Colors.red, width: 1),
-                                              ),
-                                              child: const Text(
-                                                'Incidencia',
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            return const SizedBox.shrink(); 
-                                          }
-                                        },
-                                      ),
+                                      if (inventory.status == 'reparación') 
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red[100],
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.red, width: 1),
+                                          ),
+                                          child: const Text(
+                                            'Incidencia',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       const Spacer(),
                                       IconButton(
                                         icon: const Icon(Icons.chevron_right),
