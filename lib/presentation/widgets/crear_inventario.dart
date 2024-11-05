@@ -25,7 +25,7 @@ class _CrearInventarioState extends State<CrearInventario> {
   int? tipoSeleccionado; 
   String? estadoSeleccionado;
   
-  final List<String> estados = ['Correcto', 'Usando', 'Disponible', 'Reparacion'];
+  final List<String> estados = ['correcto', 'usando', 'disponible', 'reparacion'];
 
   @override
   void initState() {
