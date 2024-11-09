@@ -4,12 +4,13 @@ import 'package:proyecto_integrador/domain/entities/inventory.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
-import 'package:proyecto_integrador/presentation/blocs/issue/issue_bloc.dart';
-import 'package:proyecto_integrador/presentation/blocs/issue/issue_event.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_event.dart';
 // ignore: unused_import
-import 'package:proyecto_integrador/presentation/blocs/issue/issue_state.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/widgets/editar_inventario.dart';
+import 'package:proyecto_integrador/presentation/widgets/filtrar_issue.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
 import 'package:proyecto_integrador/presentation/widgets/crear_inventario.dart';
 
@@ -22,6 +23,7 @@ class AdminScreen extends StatefulWidget {
 
 class AdminScreenState extends State<AdminScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  
 
   @override
   void initState() {
@@ -49,6 +51,9 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
     Colors.orange,
     Colors.purple,
     Colors.cyan,
+    Colors.black,
+    Colors.amber,
+    Colors.indigo,
   ];
 
     return Scaffold(
@@ -129,7 +134,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                               children: List.generate(state.inventories.length, (index) {
                                 final inventory = state.inventories[index];
                                 String idInventario = inventory.idInventory.toString();
-                                context.read<IssueBloc>().add(LoadIssuesEvent(filter: idInventario));
+                                int numColor = inventory.idType;
                                 return Dismissible(
                                   key: Key(inventory.idInventory.toString()),
                                   onDismissed: (direction) {
@@ -147,7 +152,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                                       Container(
                                         width: 4.0,
                                         height: 90.0,
-                                        color: colores[inventory.idInventory],
+                                        color: colores[numColor],
                                         child: const Text(" "),
                                       ),
                                       Expanded(
@@ -252,21 +257,74 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 16.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
             child: Align(
               alignment: Alignment.topCenter,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     "Apartat de Incidències",
                     textAlign: TextAlign.center,
                   ),
-                  Divider(
+                  const Divider(
                     color: Color.fromARGB(255, 71, 71, 71),
                     thickness: 1,
                   ),
+                  Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                children: [
+                  const Text("Filtrar: "),
+                    IconButton(
+                      icon: const Icon(Icons.filter_alt),
+                      onPressed: () async {
+                        final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
+                          return const AlertDialog(
+                            title: Text('Filtrar incidèncias'),
+                            content: FiltrarIssue(),
+                          );
+                        });
+                        if (result != null) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              final idStatus = result['idStatus'] != null ? result['idStatus'].toString() : 'No seleccionat';
+                              final createdAt = result['createdAt'] ?? 'No seleccionat';
+
+                              return AlertDialog(
+                                title: const Text('Resultat del filtre'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    //estos datos se le van a enviar al bloc al hacer el filtro, en el screen del admin solo enviara los parametros de idStatus y createdAt, para que el bloc devuelva solo los issues con idStatus igual al envidao y createdAt en el que sea del mismo dia
+                                    Text('idStatus: $idStatus'),
+                                    Text('createdAt: $createdAt'),
+                                  ],
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
+                    ),
+                ],
+              ),
+              const Divider(
+                color: Color.fromARGB(255, 71, 71, 71), 
+                thickness: 1, 
+              ),
+              const Text("Aqui ira lo da incidèncias"),
+            ],
+          ),
                 ],
               ),
             ),

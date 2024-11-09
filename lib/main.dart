@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
-import 'package:proyecto_integrador/presentation/blocs/issue/issue_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/themes/themes_bloc.dart';
 import 'package:proyecto_integrador/config/theme/app_theme.dart';

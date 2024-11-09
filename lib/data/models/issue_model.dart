@@ -1,6 +1,6 @@
 class IssueModel {
   final int idIssue;
-  final String createdAt;
+  final DateTime createdAt;
   final String description;
   final String lastUpdated;
   final String notes;
@@ -23,18 +23,17 @@ class IssueModel {
 
   factory IssueModel.fromJson(Map<String, dynamic> json) {
     return IssueModel(
-      idIssue: json['id_issue'] ?? 0, 
-      createdAt: json['created_at'] ?? '',
+      idIssue: json['id_issue'], 
+      createdAt: DateTime.parse(json['created_at']),
       description: json['description'] ?? 'Unknown',
-      lastUpdated: json['last_updated'] ?? '',
+      lastUpdated: json['last_updated'],
       notes: json['notes'] ?? 'Unknown',
-      idUser: (json['id_user'] != null) ? json['id_user'] : 1, 
-      idTecnic: (json['id_tecnic'] != null) ? json['id_tecnic'] : 1, 
-      idStatus: (json['id_status'] != null) ? json['id_status'] : 1, 
-      idInventory: json['id_inventory'] ?? 1, 
+      idUser: json['user']?['id_user'] ?? 1,
+      idTecnic: json['technician']?['id_user'] ?? 1,
+      idStatus: json['status']?['id_status'] ?? 1,
+      idInventory: json['fk_inventari']?['id_inventory'] ?? 1,
     );
   }
-
 
   Map<String, dynamic> toJson() {
     return {

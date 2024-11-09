@@ -1,6 +1,6 @@
 class Issue {
   final int idIssue;
-  final String createdAt;
+  final DateTime createdAt;
   final String description;
   final String lastUpdated;
   final String notes;

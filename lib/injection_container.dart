@@ -7,7 +7,7 @@ import 'package:proyecto_integrador/data/repositories/issue_repository_impl.dart
 import 'package:proyecto_integrador/domain/repositories/inventory_repository.dart';
 import 'package:proyecto_integrador/domain/repositories/issue_repository.dart';
 import 'package:proyecto_integrador/domain/usecases/get_all_issues_usecase.dart';
-import 'package:proyecto_integrador/presentation/blocs/issue/issue_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:proyecto_integrador/data/datasources/login_fake_datasource.dart';
 import 'package:proyecto_integrador/data/repositories/login_repository_impl.dart';

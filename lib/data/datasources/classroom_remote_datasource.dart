@@ -14,9 +14,9 @@ class ClassroomRemoteDataSourceImpl implements ClassroomRemoteDataSource {
  @override
  Future<List<ClassroomModel>> getAllClassrooms() async {
   const String token = 'admin';
-
+  //https://dummyjson.com/c/c1dd-935d-48d3-a380
     final response = await client.get(
-      Uri.parse('https://dummyjson.com/c/c1dd-935d-48d3-a380'),
+      Uri.parse('http://localhost:8080/classroom'),
       headers: {
         'Authorization': 'Bearer $token',
       },

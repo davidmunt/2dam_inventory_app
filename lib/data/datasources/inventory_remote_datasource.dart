@@ -16,8 +16,9 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
   @override
   Future<List<InventoryModel>> getAllInventories() async {
     const String token = 'admin';
+    // https://dummyjson.com/c/4503-8dec-4f96-8c19
     final response = await client.get(
-      Uri.parse('https://dummyjson.com/c/4503-8dec-4f96-8c19'),
+      Uri.parse('http://localhost:8080/inventari'),
       headers: {
         'Authorization': 'Bearer $token',
       },
