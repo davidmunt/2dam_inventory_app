@@ -2,7 +2,7 @@ class Issue {
   final int idIssue;
   final DateTime createdAt;
   final String description;
-  final String lastUpdated;
+  final DateTime lastUpdated;
   final String notes;
   final int idUser;
   final int idTecnic;

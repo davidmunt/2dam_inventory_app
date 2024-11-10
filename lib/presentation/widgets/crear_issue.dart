@@ -31,6 +31,7 @@ class _CrearIssueState extends State<CrearIssue> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              const Text("Crea una incidencia"),
               // Campo para idInventory
               TextFormField(
                 controller: _idInventoryController,

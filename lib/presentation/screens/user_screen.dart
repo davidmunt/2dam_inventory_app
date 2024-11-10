@@ -15,10 +15,12 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     final loginState = context.read<LoginBloc>().state;
     final nombreUser = loginState.user?.name;
     final iniciales = nombreUser?.substring(0, 2).toUpperCase();
     final idUser = loginState.user?.id;
+    context.read<IssueBloc>().add(LoadIssuesEvent());
     if (idUser != null) {
       context.read<IssueBloc>().add(FilterIssuesEvent(idUser: idUser));
     }
@@ -68,9 +70,134 @@ class UserScreen extends StatelessWidget {
                 color: Color.fromARGB(255, 71, 71, 71), 
                 thickness: 1, 
               ),
-              Column(
+              //desde aqui
+              Expanded(
+                child: BlocBuilder<IssueBloc, IssueState>(
+                  builder: (context, state) {
+                    if (state.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    else if (state.errorMessage.isNotEmpty) {
+                      return Center(
+                        child: Text(
+                          'Error: ${state.errorMessage}',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      );
+                    }
+                    else if (state.allIssues.isEmpty) {
+                      return const Center(
+                        child: Text('No hi ha incidències disponibles.'),
+                      );
+                    }
+                    else {
+                      return SingleChildScrollView(
+                        child: ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: state.filteredIssues.length,
+                          itemBuilder: (context, index) {
+                            final issue = state.filteredIssues[index];
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                                title: Text(issue.description),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Estado: ${issue.idStatus}',
+                                    ),
+                                    Text('IdUser: ${issue.idUser}'),
+                                    Text('Fecha creación: ${DateFormat('yyyy/MM/dd').format(issue.createdAt)}'),
+                                    Text('Ultima edicion: ${DateFormat('yyyy/MM/dd').format(issue.lastUpdated)}'),
+                                    Row(
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            // Acción de modificar
+                                          },
+                                          child: const Text("Modificar"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            // Acción de eliminar
+                                          },
+                                          child: const Text("Eliminar"),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                isThreeLine: true,
+                                trailing: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (issue.idStatus != 4)
+                                      Chip(
+                                        label: const Text(
+                                          'Oberta',
+                                          style: TextStyle(color: Colors.redAccent, fontSize: 12),
+                                        ),
+                                        backgroundColor: Colors.red.withOpacity(0.2),
+                                        shape: const StadiumBorder(
+                                          side: BorderSide(
+                                            color: Colors.redAccent,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                      ),
+                                    const SizedBox(height: 4), 
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+              // hasta aqui
+
+              const Divider(
+                color: Color.fromARGB(255, 71, 71, 71), 
+                thickness: 1, 
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text("Filtrar: "),
+                  //crear
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      final result = await showModalBottomSheet<Map<String, dynamic>?>(context: context, isScrollControlled: true, builder: (BuildContext context) {
+                          return const SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: CrearIssue(),
+                            ),
+                          );
+                        },
+                      );
+                      if (result != null) {
+                        final idInventory = result['idInventory'];
+                        final description = result['description'];
+                        final notes = result['notes'];
+                        // context.read<IssueBloc>().add(FilterIssuesEvent(idUser: idUser, idStatus: idStatus, createdAt: createdAt));
+                      }
+                    },
+                  ),
+                  //filtrar
                   IconButton(
                     icon: const Icon(Icons.filter_alt),
                     onPressed: () async {
@@ -87,122 +214,11 @@ class UserScreen extends StatelessWidget {
                       }
                     },
                   ),
-                ],
-              ),
-              const Divider(
-                color: Color.fromARGB(255, 71, 71, 71), 
-                thickness: 1, 
-              ),
-              const Text("Aqui mostrara las incidencias"),
-              //desde aqui
-              Expanded(
-                child: BlocBuilder<IssueBloc, IssueState>(
-                  builder: (context, state) {
-                    if (state.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    else if (state.errorMessage.isNotEmpty) {
-                      return Center(
-                        child: Text(
-                          'Error: ${state.errorMessage}',
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      );
-                    }
-                    else if (state.issues.isEmpty) {
-                      return const Center(
-                        child: Text('No hi ha incidències disponibles.'),
-                      );
-                    }
-                    else {
-                      return SingleChildScrollView(
-                        child: ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: state.issues.length,
-                          itemBuilder: (context, index) {
-                            final issue = state.issues[index];
-                            return ListTile(
-                              title: Text(issue.description),
-                              subtitle: Text(
-                                'Estado: ${issue.notes} \nFecha creacion: ${DateFormat('yyyy/MM/dd').format(issue.createdAt)}',
-                              ),
-                              isThreeLine: true,
-                            );
-                          },
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-
-              // hasta aqui
-
-              //crear
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  final result = await showModalBottomSheet<Map<String, dynamic>?>(context: context, isScrollControlled: true, builder: (BuildContext context) {
-                      return const SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: CrearIssue(),
-                        ),
-                      );
-                    },
-                  );
-                  if (result != null) {
-                    final idInventory = result['idInventory'];
-                    final description = result['description'];
-                    final notes = result['notes'];
-                    // context.read<IssueBloc>().add(FilterIssuesEvent(idUser: idUser, idStatus: idStatus, createdAt: createdAt));
-                  }
-                },
-              ),
-
-              //filtrar
-              IconButton(
-                icon: const Icon(Icons.filter_alt),
-                onPressed: () async {
-                  final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
-                    return const AlertDialog(
-                      title: Text('Filtrar incidències'),
-                      content: FiltrarIssue(),
-                    );
-                  });
-                  if (result != null) {
-                    final idStatus = result['idStatus'] ?? 1;
-                    final createdAt = result['createdAt'] as DateTime?;
-                    context.read<IssueBloc>().add(FilterIssuesEvent(idUser: idUser, idStatus: idStatus, createdAt: createdAt));
-                  }
-                },
+                ]
               ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Crea una incidència'),
-                content: const Text('La funció de crear una incidència no funciona de moment...'),
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Text("+"),
       ),
     );
   }
