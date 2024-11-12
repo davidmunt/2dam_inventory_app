@@ -14,7 +14,6 @@ class ClassroomRemoteDataSourceImpl implements ClassroomRemoteDataSource {
  @override
  Future<List<ClassroomModel>> getAllClassrooms() async {
   const String token = 'admin';
-  //https://dummyjson.com/c/c1dd-935d-48d3-a380
     final response = await client.get(
       Uri.parse('http://localhost:8080/classroom'),
       headers: {
@@ -27,16 +26,5 @@ class ClassroomRemoteDataSourceImpl implements ClassroomRemoteDataSource {
     } else {
       throw Exception('Error al cargar personajes');
     }
-  //  final response = await client
-  //      .get(Uri.parse('http://localhost:8080/classroom'));
-
-  //  if (response.statusCode == 200) {
-  //    final List<dynamic> classroomsJson = json.decode(response.body);
-  //    return classroomsJson
-  //        .map((json) => ClassroomModel.fromJson(json))
-  //        .toList();
-  //  } else {
-  //    throw Exception('Error al cargar las clases');
-  //  }
  }
 }

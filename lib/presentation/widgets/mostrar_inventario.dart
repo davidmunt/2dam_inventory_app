@@ -42,8 +42,8 @@ class MostrarInventario extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.grey, width: 1),
-            borderRadius: BorderRadius.circular(12), // Radio del borde
-            boxShadow: [
+            borderRadius: BorderRadius.circular(12), 
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 4,

@@ -14,7 +14,6 @@ class InventoryTypeRemoteDataSourceImpl implements InventoryTypeRemoteDataSource
  @override
  Future<List<InventoryTypeModel>> getAllInventoriesType() async {
   const String token = 'admin';
-  //https://dummyjson.com/c/c785-ae1b-4686-adfa
     final response = await client.get(
       Uri.parse('http://localhost:8080/inventari_type'),
       headers: {
@@ -27,16 +26,5 @@ class InventoryTypeRemoteDataSourceImpl implements InventoryTypeRemoteDataSource
     } else {
       throw Exception('Error al cargar personajes');
     }
-  //  final response = await client
-  //      .get(Uri.parse('http://localhost:8080/inventari_type'));
-
-  //  if (response.statusCode == 200) {
-  //    final List<dynamic> inventoriestypeJson = json.decode(response.body);
-  //    return inventoriestypeJson
-  //        .map((json) => InventoryTypeModel.fromJson(json))
-  //        .toList();
-  //  } else {
-  //    throw Exception('Error al cargar los tipos de inventario');
-  //  }
  }
 }

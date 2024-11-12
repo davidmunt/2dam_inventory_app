@@ -16,7 +16,6 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
   @override
   Future<List<InventoryModel>> getAllInventories() async {
     const String token = 'admin';
-    // https://dummyjson.com/c/4503-8dec-4f96-8c19
     final response = await client.get(
       Uri.parse('http://localhost:8080/inventari'),
       headers: {
@@ -29,13 +28,6 @@ class InventoryRemoteDataSourceImpl implements InventoryRemoteDataSource {
     } else {
       throw Exception('Error al cargar personajes');
     }
-    // final response = await client.get(Uri.parse('http://localhost:8080/inventari'));
-    // if (response.statusCode == 200) {
-    //   final List<dynamic> inventoriesJson = json.decode(response.body);
-    //   return inventoriesJson.map((json) => InventoryModel.fromJson(json)).toList();
-    // } else {
-    //   throw Exception('Error al cargar el inventario');
-    // }
   }
 
   @override
