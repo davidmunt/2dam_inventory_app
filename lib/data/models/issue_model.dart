@@ -42,10 +42,10 @@ class IssueModel {
       'description': description,
       'lastUpdated': lastUpdated.toIso8601String(),
       'notes': notes,
-      'idUser': idUser,
-      'idTecnic': idTecnic,
-      'idStatus': idStatus,
-      'idInventory': idInventory,
+      'user': idUser,
+      'technician': idTecnic,
+      'status': idStatus,
+      'fk_inventari': idInventory,
     };
   }
 }

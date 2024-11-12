@@ -69,7 +69,7 @@ class TechnicScreen extends StatelessWidget {
                 color: Color.fromARGB(255, 71, 71, 71), 
                 thickness: 1, 
               ),
-              const Expanded(child: MostrarIssues()),
+              Expanded(child: MostrarIssues(idTechnic: idTechnic!)),
               const Divider(
                 color: Color.fromARGB(255, 71, 71, 71), 
                 thickness: 1, 

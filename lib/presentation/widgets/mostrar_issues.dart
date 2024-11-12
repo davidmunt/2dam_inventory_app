@@ -4,9 +4,14 @@ import 'package:intl/intl.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_event.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_state.dart';
+import 'package:proyecto_integrador/presentation/widgets/crear_issue.dart';
+import 'package:proyecto_integrador/presentation/widgets/editar_issue.dart';
 
 class MostrarIssues extends StatelessWidget {
-  const MostrarIssues({super.key});
+  final int? idUser;
+  final int? idTechnic;
+
+  const MostrarIssues({super.key, this.idUser, this.idTechnic});
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +37,12 @@ class MostrarIssues extends StatelessWidget {
               shrinkWrap: true,
               itemCount: state.filteredIssues.length,
               itemBuilder: (context, index) {
+                if (idUser != null) {
+                  context.read<IssueBloc>().add(FilterIssuesEvent(idUser: idUser));
+                }
+                if (idTechnic != null) {
+                  context.read<IssueBloc>().add(FilterIssuesEvent(idTechnic: idTechnic));
+                }
                 final issue = state.filteredIssues[index];
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -50,15 +61,43 @@ class MostrarIssues extends StatelessWidget {
                       children: [
                         Text('Id Issue: ${issue.idIssue}'),
                         Text('Id Inventario: ${issue.idInventory}'),
-                        Text('IdUser: ${issue.idUser}'),
+                        Text('Nota: ${issue.notes}'),
                         Text('Fecha creación: ${DateFormat('yyyy/MM/dd').format(issue.createdAt)}'),
                         Text('Ultima edicion: ${DateFormat('yyyy/MM/dd').format(issue.lastUpdated)}'),
                         Row(
                           children: [
                             Expanded(
                               child: TextButton(
-                                onPressed: () {
-                                  // Acción de modificar
+                                onPressed: () async {
+                                  final result = await showModalBottomSheet<Map<String, dynamic>?>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (BuildContext context) {
+                                      return SingleChildScrollView(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: EditarIssue(
+                                            initialIdInventory: issue.idInventory,
+                                            initialIdStatus: issue.idStatus,
+                                            initialDescription: issue.description,
+                                            initialNotes: issue.notes,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                  if (result != null) {
+                                    context.read<IssueBloc>().add(UpdateIssueEvent(
+                                      idIssue: issue.idIssue,
+                                      description: result['description'],
+                                      notes: result['notes'],
+                                      idUser: issue.idUser,
+                                      idTecnic: issue.idTecnic,
+                                      idStatus: result['idStatus'],
+                                      idInventory: result['idInventory'],
+                                      createdAt: issue.createdAt,
+                                    ));
+                                  }
                                 },
                                 child: const Text("Modificar"),
                               ),
@@ -70,7 +109,7 @@ class MostrarIssues extends StatelessWidget {
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        title: const Text("¿Estas segur d'eliminar equesta incidencia?"),
+                                        title: const Text("¿Estas seguro de eliminar esta incidencia?"),
                                         actions: [
                                           TextButton(
                                             onPressed: () {
@@ -82,6 +121,11 @@ class MostrarIssues extends StatelessWidget {
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                               context.read<IssueBloc>().add(DeleteIssueEvent(issue.idIssue));
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('Eliminando la incidencia'),
+                                                ),
+                                              );
                                             },
                                             child: const Text("Continuar"),
                                           ),

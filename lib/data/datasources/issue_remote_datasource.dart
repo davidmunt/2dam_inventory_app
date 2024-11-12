@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 abstract class IssueRemoteDataSource {
  Future<List<IssueModel>> getAllIssues();
  Future<void> createIssue(IssueModel issue);
+ Future<void> updateIssue(int idIssue, IssueModel issue);
  Future<void> deleteIssue(int idIssue);
 }
 
@@ -43,6 +44,22 @@ class IssueRemoteDataSourceImpl implements IssueRemoteDataSource {
     );
     if (response.statusCode != 201) {
       throw Exception('Error al crear la issue');
+    }
+  }
+
+  @override
+  Future<void> updateIssue(int idIssue, IssueModel issue) async {
+    const String token = 'admin';
+    final response = await client.put(
+      Uri.parse('http://localhost:8080/issues/$idIssue'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(issue.toJson()),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Error al actualizar la issue');
     }
   }
 

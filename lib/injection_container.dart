@@ -8,6 +8,7 @@ import 'package:proyecto_integrador/domain/repositories/inventory_repository.dar
 import 'package:proyecto_integrador/domain/repositories/issue_repository.dart';
 import 'package:proyecto_integrador/domain/usecases/add_issue_usecase.dart';
 import 'package:proyecto_integrador/domain/usecases/get_all_issues_usecase.dart';
+import 'package:proyecto_integrador/domain/usecases/update_issue_usecase.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:proyecto_integrador/data/datasources/login_fake_datasource.dart';
@@ -44,10 +45,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetAllInventories(sl<InventoryRepository>()));
   sl.registerLazySingleton(() => GetAllIssues(sl()));
   sl.registerLazySingleton(() => AddIssueUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateIssueUseCase(sl()));
 
   // BloC
   sl.registerFactory(() => LoginBloc(sl(), sl()));
   sl.registerFactory(() => ThemeBloc());
   sl.registerFactory(() => InventoryBloc(inventoryRepository: sl<InventoryRepository>()));
-  sl.registerFactory(() => IssueBloc(sl<GetAllIssues>(), sl<AddIssueUseCase>()));
+  sl.registerFactory(() => IssueBloc(sl<GetAllIssues>(), sl<AddIssueUseCase>(), sl<UpdateIssueUseCase>()));
 }

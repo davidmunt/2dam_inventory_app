@@ -3,18 +3,21 @@ import 'package:equatable/equatable.dart';
 import 'package:proyecto_integrador/domain/entities/issue.dart';
 import 'package:proyecto_integrador/domain/usecases/add_issue_usecase.dart';
 import 'package:proyecto_integrador/domain/usecases/get_all_issues_usecase.dart';
+import 'package:proyecto_integrador/domain/usecases/update_issue_usecase.dart';
 import 'issue_event.dart';
 import 'issue_state.dart';
 
 class IssueBloc extends Bloc<IssueEvent, IssueState> {
   final GetAllIssues getAllIssues;
   final AddIssueUseCase addIssueUseCase;
+  final UpdateIssueUseCase updateIssueUseCase;
 
-  IssueBloc(this.getAllIssues, this.addIssueUseCase) : super(IssueState.initial()) {
+  IssueBloc(this.getAllIssues, this.addIssueUseCase, this.updateIssueUseCase) : super(IssueState.initial()) {
     on<LoadIssuesEvent>(_onLoadIssues);
     on<FilterIssuesEvent>(_onFilterIssues);
     on<AddIssueEvent>(_onAddIssue);
     on<DeleteIssueEvent>(_onDeleteIssue);
+    on<UpdateIssueEvent>(_onUpdateIssue);
   }
 
   Future<void> _onLoadIssues(
@@ -78,6 +81,42 @@ class IssueBloc extends Bloc<IssueEvent, IssueState> {
       )),
       (_) {
         final updatedIssues = List<Issue>.from(state.allIssues)..add(newIssue);
+        emit(state.copyWith(
+          isLoading: false,
+          allIssues: updatedIssues,
+          filteredIssues: updatedIssues,
+        ));
+      },
+    );
+  }
+
+  Future<void> _onUpdateIssue(
+    UpdateIssueEvent event,
+    Emitter<IssueState> emit,
+  ) async {
+    emit(state.copyWith(isLoading: true));
+    final updatedIssue = Issue(
+      idIssue: event.idIssue,
+      createdAt: event.createdAt,
+      description: event.description,
+      lastUpdated: DateTime.now(),
+      notes: event.notes,
+      idUser: event.idUser,
+      idTecnic: event.idTecnic,
+      idStatus: event.idStatus,
+      idInventory: event.idInventory,
+    );
+
+    final result = await updateIssueUseCase(updatedIssue);
+    result.fold(
+      (error) => emit(state.copyWith(
+        isLoading: false,
+        errorMessage: error.toString(),
+      )),
+      (_) {
+        final updatedIssues = state.allIssues.map((issue) {
+          return issue.idIssue == event.idIssue ? updatedIssue : issue;
+        }).toList();
         emit(state.copyWith(
           isLoading: false,
           allIssues: updatedIssues,

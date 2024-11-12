@@ -52,6 +52,27 @@ class IssueRepositoryImpl implements IssueRepository {
     }
   }
 
+  @override
+  Future<Either<Exception, void>> updateIssue(Issue issue) async {
+    try {
+      final issueModel = IssueModel(
+        idIssue: issue.idIssue,
+        createdAt: issue.createdAt,
+        description: issue.description,
+        lastUpdated: DateTime.now(),
+        notes: issue.notes,
+        idUser: issue.idUser,
+        idTecnic: issue.idTecnic,
+        idStatus: issue.idStatus,
+        idInventory: issue.idInventory,
+      );
+      await remoteDataSource.updateIssue(issue.idIssue, issueModel);
+      return const Right(null);
+    } catch (e) {
+      return Left(Exception('Error al actualizar la issue'));
+    }
+  }
+
  @override
  Future<Either<Exception, void>> deleteIssue(int idIssue) async {
   try {

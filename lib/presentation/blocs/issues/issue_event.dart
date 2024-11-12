@@ -53,3 +53,28 @@ class AddIssueEvent extends IssueEvent {
   @override
   List<Object?> get props => [description, notes, idUser, idTecnic, idStatus, idInventory];
 }
+
+class UpdateIssueEvent extends IssueEvent {
+  final int idIssue;
+  final String description;
+  final String notes;
+  final int idUser;
+  final int idTecnic;
+  final int idStatus;
+  final int idInventory;
+  final DateTime createdAt;
+
+  UpdateIssueEvent({
+    required this.idIssue,
+    required this.description,
+    required this.notes,
+    required this.idUser,
+    required this.idTecnic,
+    required this.idStatus,
+    required this.idInventory,
+    required this.createdAt,
+  });
+
+  @override
+  List<Object?> get props => [idIssue, description, notes, idUser, idTecnic, idStatus, idInventory, createdAt];
+}
