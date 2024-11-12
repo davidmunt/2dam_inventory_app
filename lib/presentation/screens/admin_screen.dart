@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:proyecto_integrador/domain/entities/inventory.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
-import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_event.dart';
 // ignore: unused_import
 import 'package:proyecto_integrador/presentation/blocs/issues/issue_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
-import 'package:proyecto_integrador/presentation/widgets/editar_inventario.dart';
+import 'package:proyecto_integrador/presentation/widgets/crear_issue.dart';
 import 'package:proyecto_integrador/presentation/widgets/filtrar_issue.dart';
+import 'package:proyecto_integrador/presentation/widgets/mostrar_inventario.dart';
+import 'package:proyecto_integrador/presentation/widgets/mostrar_issues.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
 import 'package:proyecto_integrador/presentation/widgets/crear_inventario.dart';
 
@@ -30,6 +30,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     context.read<InventoryBloc>().add(const LoadInventoriesEvent(''));
+    context.read<IssueBloc>().add(LoadIssuesEvent());
   }
 
   @override
@@ -43,6 +44,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
     final loginState = context.read<LoginBloc>().state;
     final nombreUser = loginState.user?.name;
     final iniciales = nombreUser?.substring(0, 2).toUpperCase();
+    final idUser = loginState.user?.id;
     final List<Color> colores = [
     Colors.red,
     Colors.green,
@@ -121,138 +123,7 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                     color: Color.fromARGB(255, 71, 71, 71),
                     thickness: 1,
                   ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: BlocBuilder<InventoryBloc, InventoryState>(
-                        builder: (context, state) {
-                          if (state.isLoading) {
-                            return const Center(child: CircularProgressIndicator());
-                          } else if (state.inventories.isEmpty) {
-                            return const Center(child: Text('No hay inventarios disponibles'));
-                          } else {
-                            return Column(
-                              children: List.generate(state.inventories.length, (index) {
-                                final inventory = state.inventories[index];
-                                String idInventario = inventory.idInventory.toString();
-                                int numColor = inventory.idType;
-                                return Dismissible(
-                                  key: Key(inventory.idInventory.toString()),
-                                  onDismissed: (direction) {
-                                    context.read<InventoryBloc>().add(DeleteInventoryEvent(inventory.idInventory));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Inventario eliminado'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  background: Container(color: Colors.red),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 4.0,
-                                        height: 90.0,
-                                        color: colores[numColor],
-                                        child: const Text(" "),
-                                      ),
-                                      Expanded(
-                                        child: ListTile(
-                                          title: Text('Modelo: ${inventory.model} ( ${inventory.brand} )'),
-                                          subtitle: Text(
-                                            'Num_Serie: ${inventory.numSerie} \nAula: ${inventory.idClassroom} \n${inventory.gvaDescriptionCodArticulo}',
-                                          ),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      if (inventory.status == 'reparación') 
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red[100],
-                                            borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: Colors.red, width: 1),
-                                          ),
-                                          child: const Text(
-                                            'Incidencia',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      const Spacer(),
-                                      IconButton(
-                                        icon: const Icon(Icons.chevron_right),
-                                        onPressed: () async {
-                                        final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text('Editar inventario'),
-                                            content: EditarInventario(
-                                              numSerie: inventory.numSerie,
-                                              marca: inventory.brand,
-                                              modelo: inventory.model,
-                                              idClassroom: inventory.idClassroom,
-                                              idType: inventory.idType,
-                                              estado: inventory.status,
-                                              idInventory: inventory.idInventory,
-                                              gvaCodArticle: inventory.gvaCodArticle,
-                                              gvaDescriptionCodArticulo: inventory.gvaDescriptionCodArticulo,
-                                            ),
-                                          );
-                                        });
-                                        if (result != null) {
-                                          showDialog<void>(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: const Text('Informacion de la edicion del inventario'),
-                                                content: Text(
-                                                  'id del inventario: ${result['idInventory']}\n'
-                                                  'Número de serie: ${result['numSerie']}\n'
-                                                  'Marca: ${result['marca']}\n'
-                                                  'Modelo: ${result['modelo']}\n'
-                                                  'Aula: ${result['aula']}\n'
-                                                  'Tipo: ${result['tipo']}\n'
-                                                  'gvaCodArticle: ${result['gvaCodArticle']}\n'
-                                                  'gvaDescriptionCodArticulo: ${result['gvaDescriptionCodArticulo']}\n'
-                                                  'Estado: ${result['estado']}\n',
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                    child: const Text('Aceptar'),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                          final updatedInventory = Inventory(
-                                            idInventory: result['idInventory'],
-                                            numSerie: result['numSerie'],
-                                            brand: result['marca'],
-                                            model: result['modelo'],
-                                            idClassroom: result['aula'],
-                                            idType: result['tipo'],
-                                            status: result['estado'],
-                                            gvaCodArticle: result['gvaCodArticle'],
-                                            gvaDescriptionCodArticulo: result['gvaDescriptionCodArticulo'],
-                                          );
-                                          context.read<InventoryBloc>().add(UpdateInventoryEvent(updatedInventory));
-                                        }
-                                      },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ),
+                  Expanded(child: MostrarInventario(colores: colores)),
                 ],
               ),
             ),
@@ -272,59 +143,52 @@ class AdminScreenState extends State<AdminScreen> with SingleTickerProviderState
                     color: Color.fromARGB(255, 71, 71, 71),
                     thickness: 1,
                   ),
-                  Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
-                children: [
-                  const Text("Filtrar: "),
-                    IconButton(
-                      icon: const Icon(Icons.filter_alt),
-                      onPressed: () async {
-                        final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
-                          return const AlertDialog(
-                            title: Text('Filtrar incidèncias'),
-                            content: FiltrarIssue(),
-                          );
-                        });
-                        if (result != null) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              final idStatus = result['idStatus'] != null ? result['idStatus'].toString() : 'No seleccionat';
-                              final createdAt = result['createdAt'] ?? 'No seleccionat';
-
-                              return AlertDialog(
-                                title: const Text('Resultat del filtre'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    //estos datos se le van a enviar al bloc al hacer el filtro, en el screen del admin solo enviara los parametros de idStatus y createdAt, para que el bloc devuelva solo los issues con idStatus igual al envidao y createdAt en el que sea del mismo dia
-                                    Text('idStatus: $idStatus'),
-                                    Text('createdAt: $createdAt'),
-                                  ],
+                  const Expanded(child: MostrarIssues()),
+                  const Divider(
+                    color: Color.fromARGB(255, 71, 71, 71), 
+                    thickness: 1, 
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () async {
+                          final result = await showModalBottomSheet<Map<String, dynamic>?>(context: context, isScrollControlled: true, builder: (BuildContext context) {
+                              return const SingleChildScrollView(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CrearIssue(),
                                 ),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
                               );
                             },
                           );
-                        }
-                      },
-                    ),
-                ],
-              ),
-              const Divider(
-                color: Color.fromARGB(255, 71, 71, 71), 
-                thickness: 1, 
-              ),
-              const Text("Aqui ira lo da incidèncias"),
-            ],
-          ),
+                          if (result != null) {
+                            final idInventory = result['idInventory'];
+                            final description = result['description'];
+                            final notes = result['notes'];
+                            context.read<IssueBloc>().add(AddIssueEvent(description: description, notes: notes, idInventory: idInventory, idUser: idUser ?? 1, idTecnic: 2, idStatus: 1,));
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.filter_alt),
+                        onPressed: () async {
+                          final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
+                            return const AlertDialog(
+                              title: Text('Filtrar incidències'),
+                              content: FiltrarIssue(),
+                            );
+                          });
+                          if (result != null) {
+                            final idStatus = result['idStatus'] ?? 1;
+                            final createdAt = result['createdAt'] as DateTime?;
+                            context.read<IssueBloc>().add(FilterIssuesEvent(idStatus: idStatus, createdAt: createdAt));
+                          }
+                        },
+                      ),
+                    ]
+                  ),
                 ],
               ),
             ),

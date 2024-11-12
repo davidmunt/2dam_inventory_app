@@ -102,7 +102,6 @@ class _CrearInventarioState extends State<CrearInventario> {
                   return null;
                 },
               ),
-              //
               const SizedBox(height: 10),
               TextFormField(
                 controller: _gvaDescriptionCodArticuloController,
@@ -114,7 +113,6 @@ class _CrearInventarioState extends State<CrearInventario> {
                   return null;
                 },
               ),
-              //
               TextFormField(
                 controller: _gvaCodArticleController,
                 decoration: const InputDecoration(labelText: 'Cod Articulo'),
@@ -129,7 +127,6 @@ class _CrearInventarioState extends State<CrearInventario> {
                   return null;
                 },
               ),
-              //
               const SizedBox(height: 10),
               DropdownButtonFormField<int>(
                 decoration: const InputDecoration(labelText: 'Aula'),

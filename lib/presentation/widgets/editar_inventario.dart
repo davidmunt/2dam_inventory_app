@@ -186,7 +186,6 @@ void initState() {
                 }),
                 validator: (value) => value == null ? 'Selecciona un tipo' : null,
               ),
-              //estado
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: estadoSeleccionado,
@@ -202,7 +201,6 @@ void initState() {
                 }),
                 validator: (value) => value == null ? 'Selecciona un estado' : null,
               ),
-              //estado
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

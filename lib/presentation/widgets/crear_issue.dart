@@ -32,7 +32,6 @@ class _CrearIssueState extends State<CrearIssue> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const Text("Crea una incidencia"),
-              // Campo para idInventory
               TextFormField(
                 controller: _idInventoryController,
                 decoration: const InputDecoration(labelText: 'ID Inventory'),
@@ -43,14 +42,12 @@ class _CrearIssueState extends State<CrearIssue> {
                   }
                   final id = int.tryParse(value);
                   if (id == null) {
-                    return 'Debe ser un número entero';
+                    return 'Debe ser un numero';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
-
-              // Campo para description
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(labelText: 'Descripción'),
@@ -58,15 +55,10 @@ class _CrearIssueState extends State<CrearIssue> {
                   if (value == null || value.isEmpty) {
                     return 'Este campo es obligatorio';
                   }
-                  if (value.length < 3) {
-                    return 'La descripción debe tener al menos 3 caracteres';
-                  }
                   return null;
                 },
               ),
               const SizedBox(height: 10),
-
-              // Campo para notes
               TextFormField(
                 controller: _notesController,
                 decoration: const InputDecoration(labelText: 'Notas'),
@@ -78,21 +70,18 @@ class _CrearIssueState extends State<CrearIssue> {
                 },
               ),
               const SizedBox(height: 20),
-
-              // Botones
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context, null); // Cancelar y cerrar
+                      Navigator.pop(context, null);
                     },
                     child: const Text('Cancelar'),
                   ),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // Si es válido, devuelve los datos
                         Navigator.pop(context, {
                           'idInventory': int.parse(_idInventoryController.text),
                           'description': _descriptionController.text,

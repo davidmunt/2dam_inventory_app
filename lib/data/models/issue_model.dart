@@ -38,9 +38,9 @@ class IssueModel {
   Map<String, dynamic> toJson() {
     return {
       'idIssue': idIssue,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'description': description,
-      'lastUpdated': lastUpdated,
+      'lastUpdated': lastUpdated.toIso8601String(),
       'notes': notes,
       'idUser': idUser,
       'idTecnic': idTecnic,

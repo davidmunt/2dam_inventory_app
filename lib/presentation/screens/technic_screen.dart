@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/inventory/inventory_event.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_bloc.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_event.dart';
+import 'package:proyecto_integrador/presentation/blocs/issues/issue_state.dart';
 import 'package:proyecto_integrador/presentation/blocs/login/login_bloc.dart';
+import 'package:proyecto_integrador/presentation/widgets/crear_issue.dart';
 import 'package:proyecto_integrador/presentation/widgets/filtrar_issue.dart';
 import 'package:proyecto_integrador/presentation/widgets/themes_log_out.dart';
+import 'package:proyecto_integrador/presentation/widgets/mostrar_issues.dart';
 
 class TechnicScreen extends StatelessWidget {
   const TechnicScreen({super.key});
@@ -13,6 +19,10 @@ class TechnicScreen extends StatelessWidget {
     final nombreUser = loginState.user?.name;
     final iniciales = nombreUser?.substring(0, 2).toUpperCase();
     final idTechnic = loginState.user?.id;
+    context.read<IssueBloc>().add(LoadIssuesEvent());
+    if (idTechnic != null) {
+      context.read<IssueBloc>().add(FilterIssuesEvent(idTechnic: idTechnic));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -52,87 +62,62 @@ class TechnicScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                "Aquestes són les incidències que t'han asignat:",
+                "Aquestes són les incidències que t'han assignat:",
                 textAlign: TextAlign.center,
               ),
               const Divider(
                 color: Color.fromARGB(255, 71, 71, 71), 
                 thickness: 1, 
               ),
-              Column(
-                children: [
-                  const Text("Filtrar: "),
-                    IconButton(
-                      icon: const Icon(Icons.filter_alt),
-                      onPressed: () async {
-                        final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
-                          return const AlertDialog(
-                            title: Text('Filtrar incidèncias'),
-                            content: FiltrarIssue(),
-                          );
-                        });
-                        if (result != null) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              final idStatus = result['idStatus'] != null ? result['idStatus'].toString() : 'No seleccionat';
-                              final createdAt = result['createdAt'] ?? 'No seleccionat';
-
-                              return AlertDialog(
-                                title: const Text('Resultat del filtre'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    //estos datos se le van a enviar al bloc al hacer el filtro, en el screen del user solo enviara los parametros de idTechnic, idStatus y createdAt, para que el bloc devuelva solo los issues con idTechnic igual al envidao, idStatus igual al envidao y createdAt en el que sea del mismo dia
-                                    Text('idTechnic: $idTechnic'),
-                                    Text('idStatus: $idStatus'),
-                                    Text('createdAt: $createdAt'),
-                                  ],
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () => Navigator.of(context).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }
-                      },
-                    ),
-                ],
-              ),
+              const Expanded(child: MostrarIssues()),
               const Divider(
                 color: Color.fromARGB(255, 71, 71, 71), 
                 thickness: 1, 
               ),
-              const Text("Aqui ira lo da incidèncias"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      final result = await showModalBottomSheet<Map<String, dynamic>?>(context: context, isScrollControlled: true, builder: (BuildContext context) {
+                          return const SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: CrearIssue(),
+                            ),
+                          );
+                        },
+                      );
+                      if (result != null) {
+                        final idInventory = result['idInventory'];
+                        final description = result['description'];
+                        final notes = result['notes'];
+                        context.read<IssueBloc>().add(AddIssueEvent(description: description, notes: notes, idInventory: idInventory, idUser: idTechnic ?? 1, idTecnic: 3, idStatus: 1,));
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.filter_alt),
+                    onPressed: () async {
+                      final result = await showDialog<Map<String, dynamic>?>(context: context, builder: (BuildContext context) {
+                        return const AlertDialog(
+                          title: Text('Filtrar incidències'),
+                          content: FiltrarIssue(),
+                        );
+                      });
+                      if (result != null) {
+                        final idStatus = result['idStatus'] ?? 1;
+                        final createdAt = result['createdAt'] as DateTime?;
+                        context.read<IssueBloc>().add(FilterIssuesEvent(idTechnic: idTechnic, idStatus: idStatus, createdAt: createdAt));
+                      }
+                    },
+                  ),
+                ]
+              ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Crea una incidència'),
-                content: const Text('La funció de crear una incidència no funciona de moment...'),
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Text("+"),
       ),
     );
   }

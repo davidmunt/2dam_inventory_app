@@ -14,7 +14,6 @@ class IssueState extends Equatable {
     required this.errorMessage,
   });
 
-  // Estado inicial del Bloc
   factory IssueState.initial() {
     return const IssueState(
       allIssues: [],
@@ -24,7 +23,6 @@ class IssueState extends Equatable {
     );
   }
 
-  // Método para copiar y actualizar el estado
   IssueState copyWith({
     List<Issue>? allIssues,
     List<Issue>? filteredIssues,
